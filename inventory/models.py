@@ -37,7 +37,7 @@ class Purchase(models.Model):
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
 
     def save(self, *args, **kwargs):
-        self.total_cost = self.menu_item.price * self.quantity
+        self.total_cost = self.menu_item.price_per_unit * self.quantity
         super(Purchase, self).save(*args, **kwargs)
 
     
