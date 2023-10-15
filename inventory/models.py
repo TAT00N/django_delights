@@ -23,7 +23,7 @@ class MenuItem(models.Model):
 class RecipeRequirement(models.Model):
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     ingredients = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    quantity_require = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity_required = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         unique_together = ['menu_item', 'ingredients']
