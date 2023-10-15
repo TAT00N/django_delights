@@ -16,9 +16,18 @@ class MenuItem(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True)
     price_per_unit = models.DecimalField(max_digits=10, decimal_places=2)
+    ingredients = models.ManyToManyField('Ingredient', through='MenuItemIngredient')
 
     def __str__(self):
         return self.name
+    
+class MenuItemIngredient(models.Model):
+    menu_item = models.ForeignKey('MenuItem', on_delete=models.CASCADE)
+    ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE)
+    quantity_required = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        unique_together = ('menu_item', 'ingredient')
     
 class RecipeRequirement(models.Model):
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
