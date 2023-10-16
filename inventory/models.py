@@ -50,4 +50,4 @@ class Purchase(models.Model):
         self.total_cost = self.menu_item.price_per_unit * self.quantity
         super(Purchase, self).save(*args, **kwargs)
 
-    
+#At the moment this should be reviewed. 
