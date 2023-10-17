@@ -15,11 +15,15 @@ class Ingredient(models.Model):
 class MenuItem(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True)
-    price_per_unit = models.DecimalField(max_digits=10, decimal_places=2)
     ingredients = models.ManyToManyField('Ingredient', through='MenuItemIngredient')
+
 
     def __str__(self):
         return self.name
+    
+    @property
+    def price(self):
+        return sum([mi.cost for mi in self.menuitemingredient_set.all()])
     
 class MenuItemIngredient(models.Model):
     menu_item = models.ForeignKey('MenuItem', on_delete=models.CASCADE)
@@ -28,18 +32,10 @@ class MenuItemIngredient(models.Model):
 
     class Meta:
         unique_together = ('menu_item', 'ingredient')
-    
-class RecipeRequirement(models.Model):
-    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
-    ingredients = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    quantity_required = models.DecimalField(max_digits=10, decimal_places=2)
-
-    class Meta:
-        unique_together = ['menu_item', 'ingredients']
-
-    def __str__(self): 
-        return f"{self.ingredients.name} for {self.menu_item.name}"
-    
+    @property
+    def cost(self):
+        return self.ingredient.price_per_unit * self.quantity_required
+      
 class Purchase(models.Model):
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
