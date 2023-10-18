@@ -16,7 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from inventory.views import IngredientListView, IngredientDeleteView, MenuItemListView, PurchaseListView, ProfitRevenueView, AddMenuItemView, AddIngredientView, AddRecipeRequirementView, RecordPurchaseView, UpdateIngredientView, UserLoginView, UserLogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('ingredient/', IngredientListView.as_view(), name='ingredient-list'),
+    path('ingredient/delete/<int:pk>/', IngredientDeleteView.as_view(), name='ingredient-delete'),
+    path('menu/', MenuItemListView.as_view(), name='menuitem-list'),
+    path('purchases/', PurchaseListView.as_view(), name='purchase-list'),
+    path('profits/', ProfitRevenueView.as_view(), name='profit-revenue'),
+    path('add-menu-item/', AddMenuItemView.as_view(), name='add_menu_item'),
+    path('add-ingredient/', AddIngredientView.as_view(), name='add_ingredient'),
+    path('add-recipe-requirement/', AddRecipeRequirementView.as_view(), name='add_recipe_requirement'),
+    path('record-purchase/', RecordPurchaseView.as_view(), name='record_purchase'),
+    path('update-ingredient/<int:pk>/', UpdateIngredientView.as_view(), name='update_ingredient'),
+    path('', UserLoginView.as_view(), name='login_register'),
+    path('logout/', UserLogoutView.as_view(), name='logout'),
 ]

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Purchases</h2>
+  <ul>
+    {% for purchase in object_list %}
+      <li>
+        {{ purchase.date_time }} - {{ purchase.menu_item.name }} x{{ purchase.quantity }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

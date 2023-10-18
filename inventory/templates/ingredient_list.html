@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Ingredients</h2>
+  <ul>
+    {% for ingredient in object_list %}
+      <li>
+        {{ ingredient.name }} - {{ ingredient.quantity }} {{ ingredient.unit }} at {{ ingredient.price_per_unit }} per unit
+        <a href="{% url 'ingredient-delete' ingredient.pk %}">Delete</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
