@@ -22,8 +22,8 @@ class MenuItem(models.Model):
         return self.name
     
     @property
-    def price(self):
-        return sum([mi.cost for mi in self.menuitemingredient_set.all()])
+    def cost(self):
+        return sum([mi_ingredient.cost for mi_ingredient in self.menuitemingredient_set.all()])
     
 class MenuItemIngredient(models.Model):
     menu_item = models.ForeignKey('MenuItem', on_delete=models.CASCADE)
@@ -40,10 +40,19 @@ class Order(models.Model):
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     date_time = models.DateTimeField(default=datetime.now)
-    total_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
 
     def save(self, *args, **kwargs):
-        self.total_cost = self.menu_item.price_per_unit * self.quantity
+        # Compute the total cost for this order
+        self.total_cost = self.menu_item.cost * self.quantity
+
+        # Checking for ingredient quantities
+        for mi_ingredient in self.menu_item.menuitemingredient_set.all():
+            ingredient = mi_ingredient.ingredient
+            if ingredient.quantity < (mi_ingredient.quantity_required * self.quantity):  # Multiply by order quantity
+                raise ValueError(f"Not enough {ingredient.name} to complete the order")
+
+        # Call the parent class's save method to actually save the order
         super(Order, self).save(*args, **kwargs)
 
-#At the moment this should be reviewed. 
+

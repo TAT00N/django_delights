@@ -13,6 +13,9 @@ class MenuItemIngredientInline(admin.TabularInline):
 class MenuItemAdmin(admin.ModelAdmin):
     inlines = [MenuItemIngredientInline]
 
+class OrderAdmin(admin.ModelAdmin):
+    readonly_fields = ['total_cost']
+
 admin.site.register(Ingredient, IngredientAdmin)
-admin.site.register(Order)
+admin.site.register(Order, OrderAdmin)
 admin.site.register(MenuItem, MenuItemAdmin)
