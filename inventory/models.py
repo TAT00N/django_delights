@@ -44,18 +44,19 @@ class MenuItemIngredient(models.Model):
         return self.ingredient.price_per_unit * self.quantity_required
       
 class Order(models.Model):
-    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
     date_time = models.DateTimeField(default=datetime.now)
     total_cost = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
 
     def save(self, *args, **kwargs):
-    # First, check if there's enough of each ingredient for the order.
-        for mi_ingredient in self.menu_item.menuitemingredient_set.all():
-            ingredient = mi_ingredient.ingredient
-            required_quantity = mi_ingredient.quantity_required * self.quantity
-            if ingredient.quantity < required_quantity:
-                raise ValueError(f"Not enough {ingredient.name} to complete the order")
+        # Check ingredient availability for each order item
+        for order_item in self.orderitem_set.all():
+            order_item.check_ingredient_availability()
+
+        # Update total_cost based on OrderItems
+        self.total_cost = sum([oi.cost for oi in self.orderitem_set.all()])
+        
+        super(Order, self).save(*args, **kwargs)
+
 
     # Deduct used ingredients from stock
         for mi_ingredient in self.menu_item.menuitemingredient_set.all():
@@ -64,7 +65,6 @@ class Order(models.Model):
             ingredient.quantity -= required_quantity
             ingredient.save()
 
-    # Then continue with the usual save logic
         self.total_cost = self.menu_item.cost * self.quantity
         super(Order, self).save(*args, **kwargs)
 
@@ -80,3 +80,17 @@ class BusinessConfig(models.Model):
     def __str__(self):
         return "Business Configuration"
 
+class OrderItem(models.Model):
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    menu_item = models.ForeignKey('MenuItem', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+
+    @property
+    def cost(self):
+        return self.menu_item.price * self.quantity
+    def check_ingredient_availability(self):
+        for mi_ingredient in self.menu_item.menuitemingredient_set.all():
+            ingredient = mi_ingredient.ingredient
+            required_quantity = mi_ingredient.quantity_required * self.quantity
+            if ingredient.quantity < required_quantity:
+                raise ValueError(f"Not enough {ingredient.name} for {self.menu_item.name}")
