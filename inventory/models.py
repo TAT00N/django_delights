@@ -50,17 +50,24 @@ class Order(models.Model):
     total_cost = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
 
     def save(self, *args, **kwargs):
-        # Compute the total cost for this order
-        self.total_cost = self.menu_item.cost * self.quantity
-
-        # Checking for ingredient quantities
+    # First, check if there's enough of each ingredient for the order.
         for mi_ingredient in self.menu_item.menuitemingredient_set.all():
             ingredient = mi_ingredient.ingredient
-            if ingredient.quantity < (mi_ingredient.quantity_required * self.quantity):  # Multiply by order quantity
+            required_quantity = mi_ingredient.quantity_required * self.quantity
+            if ingredient.quantity < required_quantity:
                 raise ValueError(f"Not enough {ingredient.name} to complete the order")
 
-        # Call the parent class's save method to actually save the order
+    # Deduct used ingredients from stock
+        for mi_ingredient in self.menu_item.menuitemingredient_set.all():
+            ingredient = mi_ingredient.ingredient
+            required_quantity = mi_ingredient.quantity_required * self.quantity
+            ingredient.quantity -= required_quantity
+            ingredient.save()
+
+    # Then continue with the usual save logic
+        self.total_cost = self.menu_item.cost * self.quantity
         super(Order, self).save(*args, **kwargs)
+
 
 class BusinessConfig(models.Model):
     markup_percentage = models.PositiveIntegerField(default=50, help_text="Markup percentage for menu items.")
