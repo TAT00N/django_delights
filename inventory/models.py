@@ -23,7 +23,14 @@ class MenuItem(models.Model):
     
     @property
     def cost(self):
-        return sum([mi_ingredient.cost for mi_ingredient in self.menuitemingredient_set.all()])
+        base_cost = sum([mi_ingredient.cost for mi_ingredient in self.menuitemingredient_set.all()])
+        try:
+            markup_percentage = BusinessConfig.objects.first().markup_percentage
+        except AttributeError:  # In case no configuration has been set
+            markup_percentage = settings.MENU_ITEM_MARKUP_PERCENTAGE  # The default value from settings
+        
+        markup = base_cost * (markup_percentage / 100)
+        return base_cost + markup
     
 class MenuItemIngredient(models.Model):
     menu_item = models.ForeignKey('MenuItem', on_delete=models.CASCADE)
@@ -55,4 +62,14 @@ class Order(models.Model):
         # Call the parent class's save method to actually save the order
         super(Order, self).save(*args, **kwargs)
 
+class BusinessConfig(models.Model):
+    markup_percentage = models.PositiveIntegerField(default=50, help_text="Markup percentage for menu items.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name_plural = "Business Configurations"
+
+    def __str__(self):
+        return "Business Configuration"
 
