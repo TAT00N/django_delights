@@ -36,7 +36,7 @@ class MenuItemIngredient(models.Model):
     def cost(self):
         return self.ingredient.price_per_unit * self.quantity_required
       
-class Purchase(models.Model):
+class Order(models.Model):
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     date_time = models.DateTimeField(default=datetime.now)
@@ -44,6 +44,6 @@ class Purchase(models.Model):
 
     def save(self, *args, **kwargs):
         self.total_cost = self.menu_item.price_per_unit * self.quantity
-        super(Purchase, self).save(*args, **kwargs)
+        super(Order, self).save(*args, **kwargs)
 
 #At the moment this should be reviewed. 

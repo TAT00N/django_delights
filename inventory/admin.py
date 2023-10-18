@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Ingredient, MenuItem, MenuItemIngredient, Purchase
+from .models import Ingredient, MenuItem, MenuItemIngredient, Order
 # Register your models here.
 
 class IngredientAdmin(admin.ModelAdmin):
@@ -14,5 +14,5 @@ class MenuItemAdmin(admin.ModelAdmin):
     inlines = [MenuItemIngredientInline]
 
 admin.site.register(Ingredient, IngredientAdmin)
-admin.site.register(Purchase)
+admin.site.register(Order)
 admin.site.register(MenuItem, MenuItemAdmin)
