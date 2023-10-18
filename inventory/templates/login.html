@@ -2,7 +2,7 @@
 
 {% block content %}
     <h2>Login</h2>
-    <form method="post" action="{% url 'login_register' %}">  {# Note the change here #}
+    <form method="post" action="{% url 'login_register' %}">  
         {% csrf_token %}
         {{ login_form.as_p }}
         <input type="hidden" name="action" value="login">  {# Hidden input to distinguish between login and register #}
@@ -10,7 +10,7 @@
     </form>
 
     <h2>Register</h2>
-    <form method="post" action="{% url 'login_register' %}">  {# Note the change here #}
+    <form method="post" action="{% url 'login_register' %}">  
         {% csrf_token %}
         {{ login_form.as_p }}
         <input type="hidden" name="action" value="login">  {# Hidden input to distinguish between login and register #}
